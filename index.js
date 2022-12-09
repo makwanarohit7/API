@@ -34,8 +34,8 @@ mysqlConnection.connect((err) => {
 });
 
 // To Run the server with Port Number
-app.listen(3000, () =>
-  console.log("Express server is running at port no : 3000")
+app.listen(3005, () =>
+  console.log("Express server is running at port no : 3005")
 );
 
 // CRUD Methods
@@ -100,4 +100,60 @@ app.put("/employees", (req, res) => {
       else console.log(err);
     }
   );
+});
+
+// CRUD Methods
+//Get all Addresses
+app.get("/addresses", (req, res) => {
+  mysqlConnection.query("SELECT * FROM addresses", (err, rows, fields) => {
+    if (!err) res.send(rows);
+    else console.log(err);
+  });
+});
+
+//Get the Employee Data based on Id
+app.get("/addresses/:AID", (req, res) => {
+  mysqlConnection.query(
+    "SELECT * FROM addresses WHERE AID = ?",
+    [req.params.AID],
+    (err, rows, fields) => {
+      if (!err) res.send(rows);
+      else console.log(err);
+    }
+  );
+});
+
+//Delete the Employee Data based on Id
+app.delete("/addresses/:AID", (req, res) => {
+  mysqlConnection.query(
+    "DELETE FROM addresses WHERE AID = ?",
+    [req.params.AID],
+    (err, rows, fields) => {
+      if (!err) res.send("Data Deletion Successful");
+      else console.log(err);
+    }
+  );
+});
+
+//Insert an Employee through the Stored Procedure
+app.post("/addresses", (req, res) => {
+  let emp = req.body;
+  console.log(emp);
+  var sql =
+    "SET @AID = ? ;SET @Address = ?;CALL AddorUpdateAddress(@AID,@Address);";
+  mysqlConnection.query(sql, [emp.AID, emp.Address], (err, rows, fields) => {
+    if (!err) res.send("Insertion Completed");
+    else console.log(err);
+  });
+});
+
+//Update an Employee through the Stored Procedure
+app.put("/addresses", (req, res) => {
+  let emp = req.body;
+  var sql =
+    "SET @AID = ?;SET @Address = ?;CALL AddorUpdateAddress(@AID,@Address);";
+  mysqlConnection.query(sql, [emp.AID, emp.Address], (err, rows, fields) => {
+    if (!err) res.send("Updation Done");
+    else console.log(err);
+  });
 });
